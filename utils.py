@@ -2,7 +2,74 @@ import numpy as np
 import librosa as lib
 import scipy
 import pathlib
+import pyaudio
+import wave
+from dtw import dtw
+import numpy as np
+from numpy.linalg import norm
+from numpy import fft
 from scipy.io import wavfile
+
+def makeDtw(datos):
+    # =====================================
+    # OBTENCION DE MFCC DEL NUEVO AUDIO
+    NMFCC = 30
+
+    y, sr = lib.load('./audio.wav')
+    mfccAudio = lib.feature.mfcc(y, sr,n_mfcc=NMFCC)
+
+    datosDtw = []
+
+    # =====================================
+    # CALCULO DE LAS DISTANCIAS DTW CON LA BD
+    for i in range(datos.shape[0]):
+
+        print("I: ", i)
+        dist, cost, acc_cost, path = dtw(mfccAudio.T, datos[i,0].T, dist=lambda x, y: norm(x - y, ord=2))
+        print("dtw: señal vs ", datos[i,1], " = ", dist)
+        datosDtw.append([dist, datos[i,1]])
+
+    datosDtw = np.array(datosDtw)
+    return datosDtw
+    # print("Vector de distancias: ", datosDtw.shape)
+
+# Funcion para grabar 1 segundo de audio, y almacenarlo en un wav
+def recordAudio():
+    # =====================================
+    # GRABACION DESDE MICROFONO
+    # Code here:
+
+    CHUNK = 2**11
+    RATE = 44100
+
+    p=pyaudio.PyAudio()
+    stream=p.open(  format=pyaudio.paInt16,
+                    channels=1,
+                    rate=RATE,
+                    input=True,
+                    frames_per_buffer=CHUNK)
+
+    frame = []
+    print("se graba")
+    for i in range(int(22*44100/(1024*24))): #go for a few seconds
+        data = np.fromstring(stream.read(CHUNK),dtype=np.int16)
+        frame.append(data)
+        #data
+    print("se grabó")
+    #lib.output.write_wav('./derecha_11k/audio.wav', cb, RATE)
+    
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+
+    waveFile =wave.open('./audio.wav','wb')
+    waveFile.setnchannels(1)
+    waveFile.setsampwidth(p.get_sample_size(pyaudio.paInt16))
+    waveFile.setframerate(RATE)
+    waveFile.writeframes(b''.join(frame))
+    waveFile.close()
+
+
 
 doc = """
 guarda los coeficientes cepstrales en escala de mel de los audios.
