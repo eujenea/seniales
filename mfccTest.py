@@ -20,6 +20,19 @@ def fmel(fhz):
 def fmelinv(mel):
     return 1000*(2**(mel/1000)-1)
 
+def makeFiltro(m, f,ksamples):
+    y = np.zeros((ksamples))
+    for k in range(ksamples):
+        if(k<f[m-1]):
+            y[k]=0
+        elif( f[m-1]<=k and k<=f[m] ):
+            y[k]= (k-f[m-1])/(f[m]-f[m-1])
+        elif (f[m]<=k and k<=f[m+1]):
+            y[k]=(f[m+1]-k)/(f[m+1]-f[m])
+        else:
+            y[k]=0
+    return y
+
 #ARCHIVO PARA TESTEO DE LA FUNCION MFCC
 
 windowLenght = 25 #ms
@@ -98,11 +111,17 @@ herzAxis = np.array([ fmelinv(melAxis[i]) for i in range(melAxis.shape[0])])
 
 samplesAxis = np.array([np.floor((nfft)*herzAxis[i]/(fm/2)) for i in range(herzAxis.shape[0])])
 
+filtros = np.zeros((cantCoef, nfft))
+for m in range(int(samplesAxis[0])):
+    filtros[m]=makeFiltro(m+1,samplesAxis,nfft)
+    plt.plot(filtros[m,:])
 
+print(filtros.shape)
+plt.show()
 
+#print("Hrzaxis: ", herzAxis)
+#print("Melaxis: ", melAxis)
+#print("samplesAxis: ", samplesAxis)
 
-print("Melaxis: ", melAxis)
-print("Hrzaxis: ", herzAxis)
-print("samplesAxis: ", samplesAxis)
 
 
