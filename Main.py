@@ -14,6 +14,8 @@ from utils import makeDtw
 from dtw import dtw
 # from peakutils.plot import plot as pplot
 from matplotlib import pyplot
+from compara import knnMFCC
+
 print("Iniciando")
 
 # =====================================
@@ -34,11 +36,13 @@ while True:  # making a loop
             
             print('Iniciaste Grabacion')
             recordAudio()
-            
+            knnMFCC()
+
+
             #dtw es una matriz que contiene elementos: [DistanciaDTW, IDPalabra]
             #Este vector debe enviarse al knn para poder decidir que palabra sera la seleccionada
-            dtw = makeDtw(datos)
-            print("Vector de distancias: ", dtw.shape)
+            #dtw = makeDtw(datos)
+            #print("Vector de distancias: ", dtw.shape)
         elif is_pressed("q"):
             print("Fin del programa")
             break
