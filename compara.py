@@ -4,16 +4,15 @@ import librosa as lib
 import numpy as np
 from sklearn import neighbors
 
-def knnMFCC():
-    file ="mfccFromAudio.npy"
-    y = read(file)
+
+#Parametros:
+#    y: es la base de datos para pasar a knn -> numpy array con los mfcc de todos los audios
+#    newcome: dato a etiquetar
+#    devuelve la etiqueta como un entero de 0 a 3
+def knnMFCC(y, newcome):
+
     data = y[:,0]
     etiquetas = y[:,1] #.flatten().tolist()
-    print(etiquetas)
-    y, sr = lib.load('./audio.wav')
-    mfccAudio = lib.feature.mfcc(y, sr,n_mfcc=30)
-
-    audioMfccProm = np.mean(mfccAudio.T, axis=0)
 
     dataProm=np.zeros((data.shape[0],data[0].shape[0]))
 
@@ -24,20 +23,12 @@ def knnMFCC():
     
         dataProm[idx,:] = np.mean(commando.T,axis=0)
 
-
-    # print(etiquetas)
-    # print(type(etiquetas[0]))
-
     knn =  neighbors.KNeighborsClassifier(5)
     knn.fit(dataProm.tolist(), etiquetas.tolist())
-    # print(np.mean(y[-1,0].T, axis=0))
 
+    #X = np.mean(newcome, axis=1)
 
-    #X = np.mean(y[-1,0], axis=1)
-
-    prediccion = knn.predict([audioMfccProm])
-
-    print(prediccion)
+    prediccion = knn.predict([newcome])
 
     if prediccion == 0:
         print('dale')
