@@ -1,10 +1,13 @@
 from utils import saveMFCCToFile as save
 from utils import readMFCCFromFile as read
+import utils as ut
 import librosa as lib
 import numpy as np
 from sklearn import neighbors
 
-
+#================================
+# KNN BASADO EN CADA MFCC COMO UNA DIMENSION, DONDE SE BUSCA LA MENOR DISTANCIA ENTRE
+# LAS CALCULADAS A PARTIR DE LA DISTANCIA EUCLIDEA TOMANDO TODAS LAS DIMENSIONES
 #Parametros:
 #    y: es la base de datos para pasar a knn -> numpy array con los mfcc de todos los audios
 #    newcome: dato a etiquetar
@@ -44,3 +47,11 @@ def knnMFCC(y, newcome):
         print("no reconocida")
 
     print()
+
+#=====================================
+# KNN BASADO EN LAS DISTANCIAS DADAS POR EL DTW, UNA DISTANCIA NULA INDICARIA QUE ES LA MISMA SEÑAL
+
+def knnDTW(dtw):
+
+    for i in range(dtw.shape[0]):
+        print("DTW ", i, " - ", dtw[i, :])

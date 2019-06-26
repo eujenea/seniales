@@ -18,7 +18,8 @@ def makeDtw(datos):
     NMFCC = 30
 
     y, sr = lib.load('./audio.wav')
-    mfccAudio = lib.feature.mfcc(y, sr,n_mfcc=NMFCC)
+    #mfccAudio = lib.feature.mfcc(y, sr,n_mfcc=NMFCC)
+    mfccAudio = mfcc(y, sr, globals.NMFCC, 25, 10)
 
     datosDtw = []
 
