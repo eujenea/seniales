@@ -106,20 +106,14 @@ def saveMFCCToFile(frec,cantWAVs,NMFCC,file):
     for i in range(len(paths)):
         for num in range(1,cantWAVs):
             archivo = pathlib.Path(paths[i],archivs[i]+'_'+str(num)+'.wav')
-            # print(archivo)
-            # print(paths[i])
-            # print(archivo)
             audio, frecMuestreo= lib.load(archivo)
-            #melCoef = lib.feature.mfcc(audio, frecMuestreo,n_mfcc=NMFCC)
-            melCoef = mfcc(audio, frecMuestreo, NMFCC)
+            melCoef = mfccWrapper(audio, frecMuestreo, NMFCC)
             y.append([ melCoef,  i])
-            # y.append([ melCoef,  archivs[i]])
-            
 
     np.save(file,np.array(y))
 
-
     pass
+
 
 def readMFCCFromFile(file):
     return np.load(file, allow_pickle=True)
@@ -129,20 +123,23 @@ def readMFCCFromFile(file):
 #Lee el audio grabado del microfono, calculo los mfcc con nuestra funcion, promedia los valores de las ventanas y devuelve el resultado. Este se pasa derecho a KNN
 def promediaMfccAudioGrabado():
     y, sr = lib.load('./audio.wav')
-    mfccAudio = lib.feature.mfcc(y, sr, n_mfcc=globals.NMFCC)
-    mfccAudio2 = mfcc(y, sr, globals.NMFCC)
-    audioMfccProm = np.mean(mfccAudio2.T, axis=0)
-    plt.subplot(2,1,1)
-    plt.plot(mfccAudio)
-    plt.subplot(2,1,2)
-    plt.plot(mfccAudio2)
-    plt.show()
+    mfccAudio = mfccWrapper(y, sr, globals.NMFCC)
+    audioMfccProm = np.mean(mfccAudio.T, axis=0)
+    #plt.subplot(2,1,1)
+    #plt.plot(mfccAudio)
+    #plt.subplot(2,1,2)
+    #plt.plot(mfccAudio2)
+    #plt.show()
     return audioMfccProm
 
 
 #==================================================
 #CALCULO MFCC
 #==================================================
+def mfccWrapper(y, sr, nmfcc):
+    return lib.feature.mfcc(y, sr, n_mfcc=globals.NMFCC)
+    #return mfcc(y, sr, globals.NMFCC)
+
 def fmel(fhz):
     return 1000*np.log2(1+(fhz/1000))
 
@@ -169,17 +166,12 @@ def makeFiltro(m, f,ksamples):
 #    windowLenght: tamaño de la ventana a usar (en milisegundos)
 #    windowStep: indica cada cuanto se ventanea (en milisegundos)
 
-def mfcc(signal, fm, cantCoef=30, windowLenght=25, windowStep=15):
+def mfcc(signal, fm, cantCoef=40, windowLenght=25, windowStep=10):
 
     #VENTANEO--------------------------------------------------------
     samplesLength = math.floor((windowLenght*0.001)*fm)
-    print("SamplesLen: ", samplesLength)
-
     samplesStep= math.floor((windowStep*0.001)*fm)
-    print("SamplesStep: ", samplesStep)
-
     cantVentanas = math.ceil(signal.size/samplesStep)
-    print("CantVentanas: ", cantVentanas)
 
     framedSignal = []
 
@@ -248,9 +240,7 @@ def mfcc(signal, fm, cantCoef=30, windowLenght=25, windowStep=15):
     for i in range(len(fftSignal)):
         aux=np.dot(fftSignal[i],filtros.T)
         melArray.append(aux)
-        plt.plot(aux)
-    
-    plt.show()
+        
     melArray = np.array(melArray)
     melArray = np.log(melArray.T)
     from scipy.fftpack import dct
@@ -261,7 +251,7 @@ if __name__ == "__main__":
 
 
     file ="mfccFromAudio" #Nombre de archivo
-    saveMFCCToFile("11k",8,globals.NMFCC,globals.FILE) #Realizo el guardado 
+    saveMFCCToFile("11k",23,globals.NMFCC,globals.FILE) #Realizo el guardado 
     datos = readMFCCFromFile(globals.FILE+".npy") #Leo el archivo.
     print(datos.shape) #muestro los datos. datos es un numpyarray de dos posiciones, en la posicion 0, tiene los mfcc; en la 1, la etiqueta.
 
