@@ -1,5 +1,6 @@
 from utils import saveMFCCToFile as save
 from utils import readMFCCFromFile as read
+import matplotlib.pyplot as plt
 import utils as ut
 import librosa as lib
 import numpy as np
@@ -21,10 +22,14 @@ def knnMFCC(y, newcome):
 
     for idx in range(len(data)):
         # Probar mediana
-        #dataProm.append(np.mean(commando,axis=0).flatten().tolist())
-        commando=data[idx]
-    
-        dataProm[idx,:] = np.mean(commando.T,axis=0)
+        #dataProm.append(np.mean(commando,axis=0).flatten().tolist())    
+        dataProm[idx,:] = np.median(data[idx].T,axis=0)
+        dataProm[idx,:] = np.mean(data[idx].T,axis=0)
+        
+        
+        
+        
+
 
     knn =  neighbors.KNeighborsClassifier(5)
     knn.fit(dataProm.tolist(), etiquetas.tolist())
