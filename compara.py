@@ -30,6 +30,8 @@ def knnMFCC(y, newcome):
 
     prediccion = knn.predict([newcome])
 
+    print()
+    print("Usted dijo: ")
     if prediccion == 0:
         print('dale')
     elif prediccion == 1:
@@ -41,3 +43,4 @@ def knnMFCC(y, newcome):
     else:
         print("no reconocida")
 
+    print()

@@ -9,6 +9,8 @@ import numpy as np
 from numpy.linalg import norm
 from numpy import fft
 from scipy.io import wavfile
+import globals
+import math
 
 def makeDtw(datos):
     # =====================================
@@ -106,7 +108,8 @@ def saveMFCCToFile(frec,cantWAVs,NMFCC,file):
             # print(paths[i])
             # print(archivo)
             audio, frecMuestreo= lib.load(archivo)
-            melCoef = lib.feature.mfcc(audio, frecMuestreo,n_mfcc=NMFCC)
+            #melCoef = lib.feature.mfcc(audio, frecMuestreo,n_mfcc=NMFCC)
+            melCoef = mfcc(audio, frecMuestreo, NMFCC)
             y.append([ melCoef,  i])
             # y.append([ melCoef,  archivs[i]])
             
@@ -124,7 +127,8 @@ def readMFCCFromFile(file):
 #Lee el audio grabado del microfono, calculo los mfcc con nuestra funcion, promedia los valores de las ventanas y devuelve el resultado. Este se pasa derecho a KNN
 def promediaMfccAudioGrabado():
     y, sr = lib.load('./audio.wav')
-    mfccAudio = lib.feature.mfcc(y, sr,n_mfcc=30)
+    #mfccAudio = lib.feature.mfcc(y, sr,n_mfcc=30)
+    mfccAudio = mfcc(y, sr, globals.NMFCC, 25, 10)
     audioMfccProm = np.mean(mfccAudio.T, axis=0)
     return audioMfccProm
 
@@ -158,7 +162,7 @@ def makeFiltro(m, f,ksamples):
 #    windowLenght: tamaño de la ventana a usar (en milisegundos)
 #    windowStep: indica cada cuanto se ventanea (en milisegundos)
 
-def mfcc(signal, fm, windowLenght=25, windowStep=20):
+def mfcc(signal, fm, cantCoef=30, windowLenght=25, windowStep=20):
 
     #VENTANEO--------------------------------------------------------
     samplesLength = math.floor((windowLenght*0.001)*fm)
@@ -211,7 +215,7 @@ def mfcc(signal, fm, windowLenght=25, windowStep=20):
     # BANCO DE FILTROS DE MEL
     # planteamos un minimo y un maximo en frecuencias, pasamos a mels, hacemos un equi espaciado entre esos valores en mel
     # convertimos los valores equiespaciados en Hz
-    cantCoef = 26
+    cantCoef
     nfft = fftSignal[0].shape[0] #la cantidad de samples de media ventana del espectro dde fourier
     min = 300 #hz
     max = fm/2 #hz
@@ -229,7 +233,7 @@ def mfcc(signal, fm, windowLenght=25, windowStep=20):
     filtros = np.zeros((cantCoef, nfft))
     for m in range(cantCoef):
         filtros[m]=makeFiltro(m+1,samplesAxis,nfft)
-        plt.plot(filtros[m,:])
+        #plt.plot(filtros[m,:])
 
     #plt.show()
 
@@ -245,8 +249,8 @@ if __name__ == "__main__":
 
 
     file ="mfccFromAudio" #Nombre de archivo
-    saveMFCCToFile("11k",8,30,file) #Realizo el guardado 
-    datos = readMFCCFromFile(file+".npy") #Leo el archivo.
+    saveMFCCToFile("11k",8,globals.NMFCC,globals.FILE) #Realizo el guardado 
+    datos = readMFCCFromFile(globals.FILE+".npy") #Leo el archivo.
     print(datos.shape) #muestro los datos. datos es un numpyarray de dos posiciones, en la posicion 0, tiene los mfcc; en la 1, la etiqueta.
 
     pass

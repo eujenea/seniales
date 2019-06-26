@@ -39,6 +39,8 @@ while True:  # making a loop
             #Este vector debe enviarse al knn para poder decidir que palabra sera la seleccionada
             #dtw = makeDtw(datos)
             #print("Vector de distancias: ", dtw.shape)
+
+            print("Presioná la tecla 'r' para grabar.")
         elif is_pressed("q"):
             print("Fin del programa")
             break
