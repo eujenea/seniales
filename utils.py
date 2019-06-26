@@ -129,7 +129,7 @@ def readMFCCFromFile(file):
 def promediaMfccAudioGrabado():
     y, sr = lib.load('./audio.wav')
     mfccAudio = lib.feature.mfcc(y, sr, n_mfcc=globals.NMFCC)
-    mfccAudio2 = mfcc(y, sr, globals.NMFCC, 25, 10)
+    mfccAudio2 = mfcc(y, sr, globals.NMFCC)
     audioMfccProm = np.mean(mfccAudio2.T, axis=0)
     plt.subplot(2,1,1)
     plt.plot(mfccAudio)
@@ -168,7 +168,7 @@ def makeFiltro(m, f,ksamples):
 #    windowLenght: tamaño de la ventana a usar (en milisegundos)
 #    windowStep: indica cada cuanto se ventanea (en milisegundos)
 
-def mfcc(signal, fm, cantCoef=30, windowLenght=25, windowStep=20):
+def mfcc(signal, fm, cantCoef=30, windowLenght=25, windowStep=15):
 
     #VENTANEO--------------------------------------------------------
     samplesLength = math.floor((windowLenght*0.001)*fm)
@@ -182,7 +182,7 @@ def mfcc(signal, fm, cantCoef=30, windowLenght=25, windowStep=20):
 
     framedSignal = []
 
-    for i in range(0, cantVentanas):
+    for i in range(cantVentanas):
 
         #Tomo una porcion de la señal de longitud samplesLength
         frame = signal[i*samplesStep:i*samplesStep+samplesLength]
@@ -244,14 +244,16 @@ def mfcc(signal, fm, cantCoef=30, windowLenght=25, windowStep=20):
     #plt.show()
 
     melArray=[]
-    for i in range(nfft):
-        aux=np.dot(fftSignal[0],filtros.T)
+    for i in range(len(fftSignal)):
+        aux=np.dot(fftSignal[i],filtros.T)
         melArray.append(aux)
-
+        plt.plot(aux)
+    
+    plt.show()
     melArray = np.array(melArray)
-    melArray = np.log(melArray)
+    melArray = np.log(melArray.T)
     from scipy.fftpack import dct
-    melArray = dct(melArray, type=2, axis=1, norm='ortho')
+    melArray = dct(melArray, type=2, axis=0, norm='ortho')
     return melArray
 
 if __name__ == "__main__":
