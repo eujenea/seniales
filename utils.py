@@ -10,6 +10,7 @@ from numpy.linalg import norm
 from numpy import fft
 from scipy.io import wavfile
 import globals
+import matplotlib.pyplot as plt
 import math
 
 def makeDtw(datos):
@@ -128,9 +129,14 @@ def readMFCCFromFile(file):
 #Lee el audio grabado del microfono, calculo los mfcc con nuestra funcion, promedia los valores de las ventanas y devuelve el resultado. Este se pasa derecho a KNN
 def promediaMfccAudioGrabado():
     y, sr = lib.load('./audio.wav')
-    #mfccAudio = lib.feature.mfcc(y, sr,n_mfcc=30)
-    mfccAudio = mfcc(y, sr, globals.NMFCC, 25, 10)
-    audioMfccProm = np.mean(mfccAudio.T, axis=0)
+    mfccAudio = lib.feature.mfcc(y, sr, n_mfcc=globals.NMFCC)
+    mfccAudio2 = mfcc(y, sr, globals.NMFCC, 25, 10)
+    audioMfccProm = np.mean(mfccAudio2.T, axis=0)
+    plt.subplot(2,1,1)
+    plt.plot(mfccAudio)
+    plt.subplot(2,1,2)
+    plt.plot(mfccAudio2)
+    plt.show()
     return audioMfccProm
 
 
@@ -244,7 +250,10 @@ def mfcc(signal, fm, cantCoef=30, windowLenght=25, windowStep=20):
         melArray.append(aux)
 
     melArray = np.array(melArray)
-    return melArray.T
+    melArray = np.log(melArray)
+    from scipy.fftpack import dct
+    melArray = dct(melArray, type=2, axis=1, norm='ortho')
+    return melArray
 
 if __name__ == "__main__":
 
