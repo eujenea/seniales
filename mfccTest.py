@@ -105,7 +105,7 @@ def mfcc(signal, fm, windowLenght=25, windowStep=20):
     filtros = np.zeros((cantCoef, nfft))
     for m in range(cantCoef):
         filtros[m]=makeFiltro(m+1,samplesAxis,nfft)
-        plt.plot(filtros[m,:])
+        #plt.plot(filtros[m,:])
 
     #plt.show()
 
@@ -113,7 +113,7 @@ def mfcc(signal, fm, windowLenght=25, windowStep=20):
     for i in range(nfft):
         aux=np.dot(fftSignal[0],filtros.T)
         melArray.append(aux)
-
+    #print("shape de la matriz", melArray.shape)
     melArray = np.array(melArray)
     return melArray.T
 
@@ -121,11 +121,9 @@ def mfcc(signal, fm, windowLenght=25, windowStep=20):
 if(__name__ == "__main__"):
 
     signal, fm = lib.load('dale_11k/dale_1.wav')
-
     melss = mfcc(signal, fm, 25, 10)
-
     print("mels: ",melss.shape)
-
+    
     pass
 
 
